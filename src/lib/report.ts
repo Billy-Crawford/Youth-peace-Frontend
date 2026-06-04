@@ -1,0 +1,4 @@
+// getReports()
+// getReportsByType()
+// getStatistics()
+// createReport()
