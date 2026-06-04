@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -43,14 +42,9 @@ function LocationPicker({
 }) {
   useMapEvents({
     click(e) {
-      setPosition([
-        e.latlng.lat,
-        e.latlng.lng,
-      ]);
+      setPosition([e.latlng.lat, e.latlng.lng]);
 
-      toast.success(
-        "Position sélectionnée sur la carte"
-      );
+      toast.success("Position sélectionnée sur la carte");
     },
   });
 
@@ -58,22 +52,15 @@ function LocationPicker({
 }
 
 export default function MapClient() {
-  const [reports, setReports] =
-    useState<Report[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
 
-  const [stats, setStats] =
-    useState<Statistics | null>(null);
+  const [stats, setStats] = useState<Statistics | null>(null);
 
-  const [filter, setFilter] =
-    useState("ALL");
+  const [filter, setFilter] = useState("ALL");
 
-  const [position, setPosition] =
-    useState<[number, number] | null>(
-      null
-    );
+  const [position, setPosition] = useState<[number, number] | null>(null);
 
-  const [openForm, setOpenForm] =
-    useState(false);
+  const [openForm, setOpenForm] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -93,17 +80,13 @@ export default function MapClient() {
 
       setReports(res.data);
     } catch {
-      toast.error(
-        "Erreur chargement signalements"
-      );
+      toast.error("Erreur chargement signalements");
     }
   };
 
   const loadStats = async () => {
     try {
-      const res = await api.get(
-        "/api/alerts/statistics/"
-      );
+      const res = await api.get("/api/alerts/statistics/");
 
       setStats(res.data);
     } catch {}
@@ -120,43 +103,28 @@ export default function MapClient() {
   const detectPosition = () => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setPosition([
-          pos.coords.latitude,
-          pos.coords.longitude,
-        ]);
+        setPosition([pos.coords.latitude, pos.coords.longitude]);
 
-        toast.success(
-          "Position détectée"
-        );
+        toast.success("Position détectée");
       },
-      () =>
-        toast.error(
-          "Impossible de récupérer votre position"
-        )
+      () => toast.error("Impossible de récupérer votre position"),
     );
   };
 
   const submitReport = async () => {
     if (!position) {
-      toast.error(
-        "Sélectionnez une position"
-      );
+      toast.error("Sélectionnez une position");
       return;
     }
 
     try {
-      await api.post(
-        "/api/alerts/reports/",
-        {
-          ...form,
-          latitude: position[0],
-          longitude: position[1],
-        }
-      );
+      await api.post("/api/alerts/reports/", {
+        ...form,
+        latitude: position[0],
+        longitude: position[1],
+      });
 
-      toast.success(
-        "Signalement envoyé"
-      );
+      toast.success("Signalement envoyé");
 
       setOpenForm(false);
 
@@ -170,18 +138,103 @@ export default function MapClient() {
       loadReports();
       loadStats();
     } catch {
-      toast.error(
-        "Erreur lors de l'envoi"
-      );
+      toast.error("Erreur lors de l'envoi");
     }
   };
 
   return (
     <div className="relative h-screen w-full">
-
+      Stats
       {/* Stats */}
-
       {stats && (
+        <div className="absolute right-4 top-4 z-[9999] w-80 rounded-2xl border border-slate-200 bg-white/95 p-5 shadow-2xl backdrop-blur-md antialiased select-none">
+          {/* En-tête */}
+          <div className="mb-4 flex items-center gap-2 border-b border-slate-100 pb-2.5">
+            <div className="rounded-lg bg-slate-100 p-1.5 text-slate-700">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </div>
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-900">
+              Vue d'ensemble
+            </h3>
+          </div>
+
+          {/* Grille principale */}
+          <div className="space-y-3">
+            {/* Total principal */}
+            <div className="flex items-center justify-between rounded-xl bg-slate-900 px-4 py-3 text-white shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-wide opacity-80">
+                Total signalements
+              </span>
+              <span className="text-xl font-black">{stats.total_reports}</span>
+            </div>
+
+            {/* Grid segments types */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-xl border border-slate-100 bg-red-50/50 p-3">
+                <p className="text-[10px] font-extrabold uppercase tracking-wider text-red-700/80 mb-0.5">
+                  Tensions
+                </p>
+                <p className="text-lg font-black text-red-900">
+                  {stats.total_tensions}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-100 bg-purple-50/50 p-3">
+                <p className="text-[10px] font-extrabold uppercase tracking-wider text-purple-700/80 mb-0.5">
+                  VBG
+                </p>
+                <p className="text-lg font-black text-purple-900">
+                  {stats.total_vbg}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-100 bg-blue-50/50 p-3 col-span-2">
+                <div className="flex justify-between items-center">
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700/80">
+                    Initiatives de paix
+                  </p>
+                  <p className="text-base font-black text-blue-900">
+                    {stats.total_initiatives}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Status de traitement */}
+            <div className="border-t border-slate-100 pt-3 flex items-center justify-between gap-2 text-center text-xs font-bold">
+              <div className="w-1/2 rounded-xl border border-slate-200/60 bg-slate-50/50 py-2">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                  En attente
+                </p>
+                <p className="text-sm font-black text-slate-800 mt-0.5">
+                  {stats.pending_reports}
+                </p>
+              </div>
+              <div className="w-1/2 rounded-xl border border-green-100 bg-green-50/40 py-2">
+                <p className="text-[10px] font-bold text-green-700 uppercase tracking-wide">
+                  Résolus
+                </p>
+                <p className="text-sm font-black text-green-800 mt-0.5">
+                  {stats.resolved_reports}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* {stats && (
         <div className="absolute right-4 top-4 z-[9999] w-72 rounded-2xl bg-white p-4 shadow-xl">
           <h3 className="mb-3 font-bold">
             Statistiques
@@ -218,59 +271,38 @@ export default function MapClient() {
             </p>
           </div>
         </div>
-      )}
-
+      )} */}
       {/* Actions */}
-
       <div className="absolute left-4 top-4 z-[9999] flex gap-3">
         <button
-          onClick={() =>
-            setOpenForm(true)
-          }
+          onClick={() => setOpenForm(true)}
           className="rounded-xl bg-red-600 px-4 py-2 font-medium text-white shadow-lg"
         >
           Signaler
         </button>
 
         <button
-          onClick={() =>
-            toast(
-              "🎤 Fonctionnalité bientôt disponible"
-            )
-          }
+          onClick={() => toast("🎤 Fonctionnalité bientôt disponible")}
           className="rounded-xl bg-slate-900 px-4 py-2 font-medium text-white shadow-lg"
         >
           Voice
         </button>
       </div>
-
       {/* Filtres */}
-
       <div className="absolute bottom-4 left-4 z-[9999] flex gap-2">
-        {[
-          "ALL",
-          "TENSION",
-          "VBG",
-          "INITIATIVE",
-        ].map((item) => (
+        {["ALL", "TENSION", "VBG", "INITIATIVE"].map((item) => (
           <button
             key={item}
-            onClick={() =>
-              setFilter(item)
-            }
+            onClick={() => setFilter(item)}
             className={`rounded-xl px-4 py-2 text-white ${
-              filter === item
-                ? "bg-blue-600"
-                : "bg-slate-700"
+              filter === item ? "bg-blue-600" : "bg-slate-700"
             }`}
           >
             {item}
           </button>
         ))}
       </div>
-
       {/* Carte */}
-
       <MapContainer
         center={[6.1319, 1.2228]}
         zoom={13}
@@ -281,72 +313,33 @@ export default function MapClient() {
         {reports.map((report) => (
           <Marker
             key={report.id}
-            position={[
-              Number(
-                report.latitude
-              ),
-              Number(
-                report.longitude
-              ),
-            ]}
+            position={[Number(report.latitude), Number(report.longitude)]}
           >
             <Popup>
               <div className="space-y-2">
-                <h3 className="font-bold">
-                  {report.title}
-                </h3>
+                <h3 className="font-bold">{report.title}</h3>
 
-                <p>
-                  {
-                    report.description
-                  }
-                </p>
+                <p>{report.description}</p>
 
-                <p>
-                  📍{" "}
-                  {
-                    report.location_name
-                  }
-                </p>
+                <p>📍 {report.location_name}</p>
 
-                <p>
-                  Type :{" "}
-                  {
-                    report.report_type
-                  }
-                </p>
+                <p>Type : {report.report_type}</p>
 
-                <p>
-                  Statut :{" "}
-                  {report.status}
-                </p>
+                <p>Statut : {report.status}</p>
               </div>
             </Popup>
           </Marker>
         ))}
 
-        {position && (
-          <Marker
-            position={position}
-          />
-        )}
+        {position && <Marker position={position} />}
 
-        <LocationPicker
-          setPosition={
-            setPosition
-          }
-        />
+        <LocationPicker setPosition={setPosition} />
       </MapContainer>
-
       {/* Formulaire */}
-
       {openForm && (
         <div className="absolute inset-0 z-[99999] flex items-center justify-center bg-black/60">
           <div className="w-[450px] rounded-2xl bg-white p-6 shadow-2xl">
-
-            <h2 className="mb-4 text-xl font-bold">
-              Nouveau signalement
-            </h2>
+            <h2 className="mb-4 text-xl font-bold">Nouveau signalement</h2>
 
             <input
               placeholder="Titre"
@@ -355,8 +348,7 @@ export default function MapClient() {
               onChange={(e) =>
                 setForm({
                   ...form,
-                  title:
-                    e.target.value,
+                  title: e.target.value,
                 })
               }
             />
@@ -364,72 +356,53 @@ export default function MapClient() {
             <textarea
               placeholder="Description"
               className="mb-3 w-full rounded-lg border p-3"
-              value={
-                form.description
-              }
+              value={form.description}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  description:
-                    e.target.value,
+                  description: e.target.value,
                 })
               }
             />
 
             <select
               className="mb-3 w-full rounded-lg border p-3"
-              value={
-                form.report_type
-              }
+              value={form.report_type}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  report_type:
-                    e.target.value,
+                  report_type: e.target.value,
                 })
               }
             >
-              <option value="TENSION">
-                Tension
-              </option>
+              <option value="TENSION">Tension</option>
 
-              <option value="VBG">
-                VBG
-              </option>
+              <option value="VBG">VBG</option>
 
-              <option value="INITIATIVE">
-                Initiative
-              </option>
+              <option value="INITIATIVE">Initiative</option>
             </select>
 
             <input
               placeholder="Nom du lieu"
               className="mb-3 w-full rounded-lg border p-3"
-              value={
-                form.location_name
-              }
+              value={form.location_name}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  location_name:
-                    e.target.value,
+                  location_name: e.target.value,
                 })
               }
             />
 
             <button
-              onClick={
-                detectPosition
-              }
+              onClick={detectPosition}
               className="mb-3 w-full rounded-lg bg-blue-600 py-3 text-white"
             >
               📍 Détecter ma position
             </button>
 
             <button
-              onClick={
-                submitReport
-              }
+              onClick={submitReport}
               className="w-full rounded-lg bg-green-600 py-3 text-white"
             >
               Envoyer
@@ -440,4 +413,3 @@ export default function MapClient() {
     </div>
   );
 }
-
