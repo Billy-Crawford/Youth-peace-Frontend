@@ -1,5 +1,23 @@
 // src/app/(protected)/map/page.tsx
 
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import toast from "react-hot-toast";
+// import { AlertTriangle, Mic, Navigation, X, CheckCircle, Loader2 } from "lucide-react";
+
+// import "leaflet/dist/leaflet.css";
+// import L from "leaflet";
+// import {
+//   MapContainer,
+//   TileLayer,
+//   Marker,
+//   Popup,
+//   useMapEvents,
+// } from "react-leaflet";
+
+// import api from "@/lib/api";
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,6 +35,8 @@ import {
 } from "react-leaflet";
 
 import api from "@/lib/api";
+
+// ... TOUT LE RESTE IDENTIQUE ...
 
 interface Report {
   id: string;
